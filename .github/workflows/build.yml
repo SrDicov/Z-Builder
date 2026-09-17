@@ -33,30 +33,43 @@ jobs:
         run: |
           set -x
           pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine
-          # CachyOS repos para x86_64_v3 (pacman ya soporta v3 en Artix con cachyos keyring)
-          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring/cachyos-keyring-*.pkg.tar.zst || true
-          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist/cachyos-mirrorlist-*.pkg.tar.zst || true
-          # artools-iso (si no está en repos Artix, lo trae via pacman -Sy)
-          pacman -Sy --noconfirm artools-iso || (git clone https://gitea.artixlinux.org/artix/artools.git /tmp/artools && make -C /tmp/artools && make -C /tmp/artools install)
+          pacman -S --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine arch-install-scripts
+          # Configura repos CachyOS para el host y para artools (soporta x86_64_v3)
+          mkdir -p /etc/pacman.d
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/ || true
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.d/cachyos-v3-mirrorlist /etc/pacman.d/ || true
+          mkdir -p ~/.config/artools/pacman.conf.d
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
+          # Sincroniza DBs con los nuevos repos (ahora sí existen cachyos-v3/cachyos)
+          pacman -Sy --noconfirm
+          # Instala keyring CachyOS (evita el wildcard roto: usa pacman -Sy cachyos-keyring)
+          pacman -S --noconfirm --needed cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist || true
+          pacman-key --init || true
+          pacman-key --populate cachyos || true
+          pacman-key --populate archlinux artix || true
+          # artools-iso
+          pacman -Sy --noconfirm artools-iso || (git clone https://gitea.artixlinux.org/artix/artools.git /tmp/artools && make -C /tmp/artools install)
           # Parches Z-Linux
           bash ./iso-profiles/artools-patches/aplicar-parches.sh
           bash -n /usr/share/artools/lib/iso/*.sh /usr/bin/buildiso
           ls -lh /usr/share/artools/lib/iso/config.sh
+          cat ~/.config/artools/pacman.conf.d/iso-x86_64.conf | head -n 30
 
       - name: Build ISO (chroot + squash + limine)
         run: |
+          set -e
           set -x
-          # Copia iso-profiles al workspace de artools (soporta tanto artools-workspace como /var/lib/artools)
           mkdir -p ~/artools-workspace
           cp -a iso-profiles ~/artools-workspace/
-          # buildiso espera perfil en ~/artools-workspace/iso-profiles
-          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" -x 2>&1 | tail -n 100
-          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/dinit/livefs || true
-          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" 2>&1 | tail -n 100
-          ls -lh ~/artools-workspace/iso/zlinux/ || ls -lh /var/lib/artools/buildiso/zlinux/ || true
-          sha256sum ~/artools-workspace/iso/zlinux/*.iso > SHA256SUMS || true
+          # -x = solo chroot, verifica antes del squash
+          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" -x 2>&1 | tee /tmp/build-x.log | tail -n 100
+          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/dinit/livefs
+          # Build completo (squash + iso limine)
+          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" 2>&1 | tee /tmp/build.log | tail -n 100
+          ls -lh ~/artools-workspace/iso/zlinux/
+          sha256sum ~/artools-workspace/iso/zlinux/*.iso > SHA256SUMS
           cat SHA256SUMS
+          cat ~/artools-workspace/iso/zlinux/*.iso.sha256 2>/dev/null || true
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
