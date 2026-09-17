@@ -54,6 +54,7 @@ jobs:
           pacman -S --noconfirm cachyos/pacman || true
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
+          sed -i '/^IgnorePkg/d' ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           pacman-key --init || true
           pacman-key --populate cachyos || true
           pacman-key --populate artix archlinux || true
