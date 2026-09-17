@@ -40,6 +40,8 @@ jobs:
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.d/cachyos-v3-mirrorlist /etc/pacman.d/ || true
           mkdir -p ~/.config/artools/pacman.conf.d
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
+          # Artools (chroot) no debe tener IgnorePkg para el basestrap inicial, solo para el sistema ya instalado
+          sed -i '/^IgnorePkg/d' ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
           # Instala pacman CachyOS (soporta x86_64_v3, stock rechaza v3)
           cp /etc/pacman.conf /tmp/pacman.conf.bak
