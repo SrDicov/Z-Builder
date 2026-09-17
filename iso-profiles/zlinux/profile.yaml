@@ -37,8 +37,16 @@ rootfs:
     - cachyos-v3-mirrorlist
     - artix-archlinux-support
     - system/util-linux
+    - system/util-linux-libs
     - system/pam
+    - system/dbus
+    - system/procps-ng
+    - system/gnupg
+    - system/gpgme
+    - system/libassuan
     - world/modemmanager
+    - world/libmm-glib
+    - world/libwireplumber
     - world/pcsclite
     - world/wireplumber
     - world/udisks2
