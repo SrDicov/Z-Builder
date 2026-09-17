@@ -76,6 +76,15 @@ jobs:
         run: |
           set -eo pipefail
           set -x
+          # /var/lib/artools vive en overlay del contenedor y el kernel
+          # rechaza overlay-sobre-overlay como upperdir (make_livefs).
+          # Redirige el workdir al workspace (bind mount ext4 del host).
+          mkdir -p "${GITHUB_WORKSPACE}/buildiso-work"
+          mkdir -p /var/lib/artools
+          rm -rf /var/lib/artools/buildiso
+          ln -s "${GITHUB_WORKSPACE}/buildiso-work" /var/lib/artools/buildiso
+          df -h "${GITHUB_WORKSPACE}" /var/lib/artools/buildiso | head
+          stat -f -c 'fstype=%T' "${GITHUB_WORKSPACE}/buildiso-work" /tmp
           mkdir -p ~/artools-workspace
           cp -a iso-profiles ~/artools-workspace/
           # -x = solo chroot, verifica antes del squash
