@@ -41,13 +41,17 @@ jobs:
           mkdir -p ~/.config/artools/pacman.conf.d
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
-          # Sincroniza DBs con los nuevos repos (ahora sí existen cachyos-v3/cachyos)
-          pacman -Sy --noconfirm
-          # Instala keyring CachyOS (evita el wildcard roto: usa pacman -Sy cachyos-keyring)
-          pacman -S --noconfirm --needed cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist || true
+          # Instala keyring CachyOS antes de sincronizar (evita unknown trust)
+          curl -sL https://at.cachyos.org/repo/x86_64/cachyos/cachyos-keyring/ | grep -o 'cachyos-keyring[^"]*\.pkg\.tar\.zst' | head -1 > /tmp/ckver || echo "cachyos-keyring-20240331-1-any.pkg.tar.zst" > /tmp/ckver
+          CK=$(cat /tmp/ckver)
+          curl -L -o /tmp/cachyos-keyring.pkg.tar.zst "https://at.cachyos.org/repo/x86_64/cachyos/cachyos-keyring/${CK}" || curl -L -o /tmp/cachyos-keyring.pkg.tar.zst "https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring/${CK}"
+          pacman -U --noconfirm /tmp/cachyos-keyring.pkg.tar.zst || true
           pacman-key --init || true
           pacman-key --populate cachyos || true
-          pacman-key --populate archlinux artix || true
+          pacman-key --populate artix archlinux || true
+          # Ahora sí sincroniza con los repos CachyOS ya confiables
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed cachyos-mirrorlist cachyos-v3-mirrorlist || true
           # artools-iso
           pacman -Sy --noconfirm artools-iso || (git clone https://gitea.artixlinux.org/artix/artools.git /tmp/artools && make -C /tmp/artools install)
           # Parches Z-Linux
