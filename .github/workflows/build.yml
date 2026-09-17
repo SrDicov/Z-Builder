@@ -104,7 +104,20 @@ jobs:
             exit 1
           fi
           echo "-x OK (locks presentes, exit $XCODE es el 'Continue squash' esperado)"
-          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/artix/livefs | tee /tmp/verificar.log
+          # Verificar contra la vista MERGED (la que ve el live real):
+          # tras el umount, livefs/ solo es el upper (diff) y rootfs es el
+          # lower; os-release, kernel, db pacman, etc. viven abajo.
+          VDIR=/tmp/zverify; WDIR=/var/lib/artools/buildiso/zlinux/artix; MNTW=/var/lib/artools/buildiso/zlinux/mnt
+          mkdir -p "$VDIR" "$MNTW/work-verify"
+          mount -t overlay overlay -olowerdir=$WDIR/rootfs,upperdir=$WDIR/livefs,workdir=$MNTW/work-verify "$VDIR"
+          set +e
+          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh "$VDIR" | tee /tmp/verificar.log
+          VCODE=${PIPESTATUS[0]}
+          set -e
+          umount "$VDIR" 2>/dev/null || umount -l "$VDIR" || true
+          rm -rf "$MNTW/work-verify"
+          echo "verificar exit code: $VCODE"
+          [ "$VCODE" -eq 0 ]
           # Build completo (squash + iso limine)
           buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" 2>&1 | tee /tmp/build.log | tail -n 100
           ls -lh ~/artools-workspace/iso/zlinux/
