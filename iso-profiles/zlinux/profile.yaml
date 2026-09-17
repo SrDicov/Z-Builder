@@ -109,6 +109,9 @@ rootfs:
     - gvfs-gphoto2
   packages-init:
     dinit:
+      - dinit
+      - elogind
+      - elogind-dinit
       - metalog-dinit
       - networkmanager-dinit
       - cups-dinit
