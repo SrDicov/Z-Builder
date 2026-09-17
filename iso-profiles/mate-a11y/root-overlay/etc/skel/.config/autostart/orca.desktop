@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=sh -c "~/.config/autostart/orca.sh"
+Name=Hack orca in pipewire
+StartupNotify=false
+Terminal=false
+Type=Application

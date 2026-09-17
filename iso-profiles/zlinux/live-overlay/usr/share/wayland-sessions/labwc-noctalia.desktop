@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Z Linux Labwc+Noctalia
+Comment=Labwc stacking + Noctalia shell (sin systemd)
+Exec=/usr/local/bin/labwc-noctalia-wrap
+Type=Application
+DesktopNames=labwc

@@ -1,0 +1,92 @@
+---
+
+live-session:
+  user: artix
+  password: artix
+  autologin: true
+  use-xlibre: false
+  services:
+    - acpid
+    - bluetoothd
+    - cronie
+    - chrony
+    - cupsd
+    - metalog
+    - connmand
+    - lightdm
+  user-services:
+    - dbus
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+rootfs:
+  packages:
+    - adwaita-icon-theme
+    - atril
+    - connman-gtk
+    - elementary-icon-theme
+    - ephoto
+    - epiphany
+    - evisum
+    - featherpad
+    - lightdm-gtk-greeter
+    - moksha-artix
+    - moksha-icon-themes
+    - moksha-modules-extra
+    - moksha-themes
+    - pavucontrol
+    - qt6ct
+    - terminology
+    - thunar
+    - volumeicon
+  packages-init:
+    dinit:
+      - pipewire-dinit
+      - pipewire-pulse-dinit
+      - wireplumber-dinit
+      - userspawn-dinit
+      - lightdm-dinit
+      - metalog-dinit
+      - connman-dinit
+      - cups-dinit
+    openrc:
+      - pipewire-openrc
+      - pipewire-pulse-openrc
+      - wireplumber-openrc
+      - lightdm-openrc
+      - metalog-openrc
+      - connman-openrc
+      - cups-openrc
+    runit:
+      - lightdm-runit
+      - metalog-runit
+      - connman-runit
+      - cups-runit
+    s6:
+      - lightdm-s6
+      - metalog-s6
+      - connman-s6
+      - cups-s6
+livefs:
+  packages:
+    - amd-ucode
+    - artix-docs
+    - artix-grub-live
+    - broadcom-wl
+    - calamares-extensions
+    - gparted
+    - hexchat
+    - intel-ucode
+    - mkinitcpio-nfs-utils
+    - nbd
+    - squashfs-tools
+    - virtualbox-guest-utils
+  packages-init:
+    dinit:
+      - artix-live-dinit
+    openrc:
+      - artix-live-openrc
+    runit:
+      - artix-live-runit
+    s6:
+      - artix-live-s6

@@ -1,0 +1,58 @@
+--- a/usr/bin/buildiso
++++ b/usr/bin/buildiso
+@@ -170,28 +170,25 @@
+ 
+ make_grub(){
+     if [[ ! -e ${work_dir}/grub.lock ]]; then
+-        msg "Prepare [/iso/boot/grub]"
++        msg "Prepare [/iso/boot/limine]"
+ 
+         local layer=${work_dir}/rootfs
+         if "${HAS_LIVE}"; then
+             layer=${work_dir}/livefs
+         fi
+ 
+-        prepare_grub "${work_dir}/rootfs" "$layer"
+-
+-        if ${use_dracut}; then
+-            configure_grub_dracut
+-        else
+-            configure_grub_mkinitcpio
+-        fi
++        # ZLINUX-LIMINE: Limine total (BIOS+UEFI), sin GRUB
++        prepare_limine "${work_dir}/rootfs" "$layer"
+ 
+         : > "${work_dir}"/grub.lock
+-        msg "Done [/iso/boot/grub]"
++        msg "Done [/iso/boot/limine]"
+     fi
+ }
+ 
+ gen_iso_fn(){
+-    local vars=("artix") name
++    # ZLINUX: sin prefijo de distro (el perfil ya se llama 'zlinux'):
++    # zlinux-dinit-<VERSION>-<arch>.iso en vez de artix-zlinux-artix-...
++    local vars=() name
+     vars+=("${profile}")
+     vars+=("${INITSYS}")
+     case "${STABILITY}" in
+@@ -225,7 +222,9 @@
+ 
+     iso_file=$(gen_iso_fn).iso
+ 
+-    iso_label="ARTIX_$(date +%Y%m)"
++    # ZLINUX: etiqueta propia (antes ARTIX_). Visible en Ventoy,
++    # /dev/disk/by-label/ y el cmdline del live (label=).
++    iso_label="ZLINUX_$(date +%Y%m)"
+ 
+     basestrap_args+=(-C "${pacman_conf}")
+     work_dir=${chroots_iso}/${profile}/artix
+@@ -265,7 +264,7 @@
+ }
+ 
+ mk_iso(){
+-    touch "${iso_root}/.artix"
++    touch "${iso_root}/.zlinux"
+     msg "Making bootable image"
+     # Sanity checks
+     [[ ! -d "${iso_root}" ]] && return 1

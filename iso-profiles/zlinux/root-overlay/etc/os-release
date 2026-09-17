@@ -1,0 +1,11 @@
+# Z-Linux os-release (overrides artix-branding-base).
+# ID_LIKE keeps third-party scripts that check for artix/arch working.
+NAME="Z-Linux"
+PRETTY_NAME="Z-Linux"
+ID=zlinux
+ID_LIKE="artix arch"
+BUILD_ID=rolling
+VERSION="2026.09"
+VERSION_ID=202609
+ANSI_COLOR="0;32"
+LOGO=zlinux

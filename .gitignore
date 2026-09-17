@@ -1,0 +1,10 @@
+# host VM disks / ISOs — no subir
+*.qcow2
+*.iso
+*.img
+*.bundle
+cache/
+workspace/
+*.log
+z-builder_VARS.fd
+# pacman cache se gestiona via Actions cache, no en repo

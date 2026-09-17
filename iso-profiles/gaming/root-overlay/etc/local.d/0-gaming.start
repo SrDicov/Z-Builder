@@ -1,0 +1,6 @@
+#!/bin/sh
+
+username=$(awk -F: '$3 == 1000 { print $1; exit }' /etc/passwd)
+[ -n "$username" ] && usermod -a -G games $username
+
+rm -f $0

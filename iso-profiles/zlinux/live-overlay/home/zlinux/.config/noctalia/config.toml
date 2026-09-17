@@ -1,0 +1,30 @@
+# Z Linux defaults (Noctalia v5)
+[shell]
+font_family = "sans-serif"
+telemetry_enabled = false
+
+[bar.main]
+position = "top"
+thickness = 30
+start = ["launcher", "workspaces"]
+center = ["clock"]
+end = ["tray", "network", "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
+
+[dock]
+enabled = true
+position = "bottom"
+auto_hide = true
+pinned = ["foot", "thunar", "librewolf"]
+
+[wallpaper.default]
+path = "/usr/share/noctalia/assets/noctalia-wallpaper.png"
+
+[idle.behavior.lock]
+timeout = 600
+action = "lock"
+enabled = false  # live: sin bloqueo (Kasha lo activa al instalar)
+
+[idle.behavior.screen-off]
+timeout = 660
+action = "screen_off"
+enabled = false  # live: pantalla siempre on (Kasha lo activa al instalar)

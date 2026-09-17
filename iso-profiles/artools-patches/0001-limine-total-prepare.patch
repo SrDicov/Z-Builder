@@ -1,0 +1,96 @@
+--- a/usr/share/artools/lib/iso/grub.sh
++++ b/usr/share/artools/lib/iso/grub.sh
+@@ -62,3 +62,93 @@
+ }
+ 
+ #}}}
++
++#{{{ limine - ZLINUX: arranque total con Limine (BIOS+UEFI), sin GRUB
++
++prepare_limine(){
++    local lim_src=/usr/share/limine
++    local limine
++    limine=${iso_root}/boot
++
++    msg2 "Copying %s ..." "limine-bios-cd.bin"
++    cp "${lim_src}"/limine-bios-cd.bin "${limine}"/
++
++    msg2 "Copying %s ..." "limine-bios.sys (stage 3 BIOS)"
++    cp "${lim_src}"/limine-bios.sys "${limine}"/
++
++    msg2 "Copying %s ..." "boot_hybrid.img (MBR isohybrid)"
++    cp /usr/lib/grub/i386-pc/boot_hybrid.img "${limine}"/boot_hybrid.img
++
++    if [[ -f "${root_overlay}"/boot/splash-1080.png ]]; then
++        msg2 "Copying %s ..." "splash-1080.png (fondo del menu)"
++        cp "${root_overlay}"/boot/splash-1080.png "${limine}"/
++    else
++        warning "splash-1080.png no encontrado en el perfil; menu sin fondo"
++    fi
++
++    msg2 "Writing %s ..." "limine.conf (tema Z-Linux)"
++    cat > "${limine}"/limine.conf <<LIMINECFG
++# Z-Linux — generado por artools prepare_limine(). No editar a mano.
++timeout: 10
++default_entry: 1
++remember_last_entry: yes
++
++interface_branding: Z-Linux
++interface_branding_colour: abc2ab
++interface_help_colour: 478061
++
++wallpaper: boot():/boot/splash-1080.png
++wallpaper_style: centered
++backdrop: 000000
++
++graphics: yes
++mouse: yes
++editor_enabled: yes
++quiet: no
++
++/Z-Linux Live
++    comment: Arrancar el sistema en vivo
++    protocol: linux
++    kernel_path: boot():/boot/vmlinuz-${arch}
++    module_path: boot():/boot/intel-ucode.img
++    module_path: boot():/boot/amd-ucode.img
++    module_path: boot():/boot/initramfs-${arch}.img
++    cmdline: label=${iso_label} overlay=livefs zswap.enabled=0 quiet
++
++/Opciones avanzadas
++    //Z-Linux Live (modo compatibilidad)
++        comment: Sin aceleracion grafica (nomodeset)
++        protocol: linux
++        kernel_path: boot():/boot/vmlinuz-${arch}
++        module_path: boot():/boot/intel-ucode.img
++        module_path: boot():/boot/amd-ucode.img
++        module_path: boot():/boot/initramfs-${arch}.img
++        cmdline: label=${iso_label} overlay=livefs zswap.enabled=0 nomodeset
++    //Consola de rescate
++        comment: Shell de rescate en initramfs
++        protocol: linux
++        kernel_path: boot():/boot/vmlinuz-${arch}
++        module_path: boot():/boot/intel-ucode.img
++        module_path: boot():/boot/amd-ucode.img
++        module_path: boot():/boot/initramfs-${arch}.img
++        cmdline: label=${iso_label} overlay=livefs zswap.enabled=0 break=y
++
++/Memtest86+
++    comment: Test de memoria RAM
++    protocol: linux
++    kernel_path: boot():/boot/memtest
++LIMINECFG
++
++    local mnt="${mnt_dir}/efiboot" efi_img="${iso_root}/boot/efi.img"
++    msg2 "Creating fat image (Limine UEFI) ..."
++    truncate -s 4M "${efi_img}"
++    mkfs.fat -n ZLINUX_EFI "${efi_img}" &>/dev/null
++    prepare_dir "${mnt}"
++    mount_img "${efi_img}" "${mnt}"
++    prepare_dir "${mnt}"/efi/boot
++    msg2 "Copying %s ..." "BOOTX64.EFI"
++    cp "${lim_src}"/BOOTX64.EFI "${mnt}"/efi/boot/BOOTX64.EFI
++    umount_img "${mnt}"
++}
++
++#}}}

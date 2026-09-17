@@ -1,0 +1,69 @@
+name: Build Z-Linux ISO
+
+on:
+  push:
+    branches: [main, wip]
+    paths: ["iso-profiles/**", ".github/workflows/build.yml"]
+  pull_request:
+    paths: ["iso-profiles/**"]
+  workflow_dispatch:
+    inputs:
+      profile: {description: "profile", default: "zlinux", type: string}
+      initsys: {description: "initsys", default: "dinit", type: string}
+
+jobs:
+  iso:
+    runs-on: ubuntu-latest
+    container:
+      image: artixlinux/artix:latest
+      options: --privileged
+    steps:
+      - name: Checkout Z-Builder
+        uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+
+      - name: Cache pacman pkg
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/pacman/pkg
+          key: pacman-${{ hashFiles('iso-profiles/zlinux/profile.yaml', 'iso-profiles/common/**', 'iso-profiles/artools-patches/**') }}
+          restore-keys: pacman-
+
+      - name: Setup builder (pacman CachyOS + artools + limine)
+        run: |
+          set -x
+          pacman -Sy --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine
+          # CachyOS pacman (soporta x86_64_v3) — reemplaza pacman stock
+          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring*.pkg.tar.zst || true
+          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist*.pkg.tar.zst || true
+          # artools-iso 0.39.1-1 (Artix)
+          pacman -Sy --noconfirm artools-iso || pacman -U --noconfirm https://artixlinux.org/packages/artools-iso*.pkg.tar.zst
+          # Parches Z-Linux (viven en iso-profiles/artools-patches)
+          ./iso-profiles/artools-patches/aplicar-parches.sh || bash ./iso-profiles/artools-patches/aplicar-parches.sh
+          bash -n /usr/share/artools/lib/iso/*.sh /usr/bin/buildiso
+          ls -lh /usr/share/artools/lib/iso/config.sh
+
+      - name: Build ISO (chroot + squash + limine)
+        run: |
+          set -x
+          # Copia iso-profiles al workspace de artools (soporta tanto artools-workspace como /var/lib/artools)
+          mkdir -p ~/artools-workspace
+          cp -a iso-profiles ~/artools-workspace/
+          # buildiso espera perfil en ~/artools-workspace/iso-profiles
+          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" -x 2>&1 | tail -n 100
+          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/dinit/livefs || true
+          buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" 2>&1 | tail -n 100
+          ls -lh ~/artools-workspace/iso/zlinux/ || ls -lh /var/lib/artools/buildiso/zlinux/ || true
+          sha256sum ~/artools-workspace/iso/zlinux/*.iso > SHA256SUMS || true
+          cat SHA256SUMS
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zlinux-iso
+          path: |
+            ~/artools-workspace/iso/zlinux/*.iso
+            SHA256SUMS
+            iso-profiles/zlinux/profile.yaml
+          retention-days: 14
+          if-no-files-found: error

@@ -1,0 +1,5 @@
+type            = process
+command         = /usr/bin/timidity -iA -Oj
+smooth-recovery = true
+depends-on      = pipewire-pulse
+log-type        = buffer

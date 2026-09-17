@@ -1,0 +1,86 @@
+---
+
+live-session:
+  user: artix
+  password: artix
+  autologin: true
+  use-xlibre: false
+  services:
+    - acpid
+    - bluetoothd
+    - cronie
+    - chrony
+    - cupsd
+    - metalog
+    - NetworkManager
+    - sddm
+  user-services:
+    - dbus
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+rootfs:
+  packages:
+    - artix-sddm-theme
+    - breeze-icons
+    - falkon
+    - kate
+    - libstatgrab
+    - lxqt
+    - lxqt-archiver
+    - network-manager-applet
+    - screengrab
+    - xdg-dbus-proxy
+    - xpdf
+    - xscreensaver
+    - xdg-desktop-portal-gtk
+    - gtk-engine-murrine
+  packages-init:
+    dinit:
+      - cups-dinit
+      - metalog-dinit
+      - pipewire-dinit
+      - pipewire-pulse-dinit
+      - wireplumber-dinit
+      - userspawn-dinit
+      - networkmanager-dinit
+      - sddm-dinit
+    openrc:
+      - cups-openrc
+      - metalog-openrc
+      - pipewire-openrc
+      - pipewire-pulse-openrc
+      - wireplumber-openrc
+      - networkmanager-openrc
+      - sddm-openrc
+    runit:
+      - cups-runit
+      - metalog-runit
+      - userspawn-runit
+      - networkmanager-runit
+      - sddm-runit
+    s6:
+      - cups-s6
+      - metalog-s6
+      - networkmanager-s6
+      - sddm-s6
+livefs:
+  packages:
+    - artix-docs
+    - artix-grub-live
+    - broadcom-wl
+    - calamares-extensions
+    - mkinitcpio-nfs-utils
+    - squashfs-tools
+    - virtualbox-guest-utils
+    - konversation
+    - partitionmanager
+  packages-init:
+    dinit:
+      - artix-live-dinit
+    openrc:
+      - artix-live-openrc
+    runit:
+      - artix-live-runit
+    s6:
+      - artix-live-s6

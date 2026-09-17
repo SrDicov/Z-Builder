@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+
+description="Add lightdm to audio group"
+command="/usr/bin/usermod"
+command_args="-a -G audio lightdm"
+
+depend() {
+    before lightdm
+}
+
+start_post() {
+    rm -f /etc/init.d/lightdm-audio
+}

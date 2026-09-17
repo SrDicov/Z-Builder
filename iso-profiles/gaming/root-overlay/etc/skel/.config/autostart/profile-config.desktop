@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=sh -c "~/.config/autostart/profile-config.sh"
+Name=Run-once gaming profile tweaks
+StartupNotify=false
+Terminal=false
+Type=Application

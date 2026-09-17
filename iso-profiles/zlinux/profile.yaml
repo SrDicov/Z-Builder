@@ -1,0 +1,141 @@
+---
+
+live-session:
+  user: zlinux
+  password: zlinux
+  autologin: true
+  use-xlibre: false
+  services:
+    - acpid
+    - bluetoothd
+    - cronie
+    - chrony
+    - metalog
+    - NetworkManager
+    - seatd
+    - zram-setup
+    - turnstiled
+    - cupsd
+    - power-profiles-daemon
+  user-services:
+    - dbus
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+rootfs:
+  packages:
+    - mkinitcpio-nfs-utils
+    - squashfs-tools
+    - cachyos/pacman
+    - cachyos-v3/glibc
+    - cachyos/mesa
+    - cachyos-keyring
+    - cachyos-mirrorlist
+    - cachyos-v3-mirrorlist
+    - artix-archlinux-support
+    - system/util-linux
+    - system/pam
+    - world/modemmanager
+    - world/pcsclite
+    - world/wireplumber
+    - world/udisks2
+    - world/fluidsynth
+    - world/sdbus-cpp
+    - world/wlroots0.20
+    - world/at-spi2-core
+    - world/gcr
+    - world/gcr-4
+    - world/xdg-desktop-portal
+    - world/appstream
+    - world/avahi
+    - world/qt5-base
+    - world/qt6-base
+    - labwc
+    - noctalia
+    - world/seatd
+    - turnstile
+    - iwd
+    - mimalloc
+    - snapper
+    - brightnessctl
+    - grim
+    - slurp
+    - wl-clipboard
+    - kanshi
+    - wlr-randr
+    - thunar
+    - librewolf
+    - pipewire
+    - pipewire-pulse
+    - pipewire-alsa
+    - pipewire-jack
+    - world/libpulse
+    - bluez
+    - bluez-utils
+    - world/gnome-keyring
+    - xdg-desktop-portal-gtk
+    - polkit-gnome
+    - world/polkit
+    - wlopm
+    - foot
+    - btop
+    - fastfetch
+    - micro
+    - vim
+    - alsa-utils
+    - mesa-utils
+    - vulkan-tools
+    - world/rtkit
+    - tumbler
+    - ffmpegthumbnailer
+    - poppler-glib
+    - cups
+    - power-profiles-daemon
+    - mpv
+    - imv
+    - zathura
+    - zathura-pdf-mupdf
+    - mousepad
+    - galculator
+    - thunar-archive-plugin
+    - thunar-volman
+    - file-roller
+    - 7zip
+    - unzip
+    - zip
+    - unrar
+    - gvfs
+    - gvfs-mtp
+    - gvfs-gphoto2
+  packages-init:
+    dinit:
+      - metalog-dinit
+      - networkmanager-dinit
+      - cups-dinit
+      - openssh-dinit
+      - artix-live-dinit
+      - turnstile-dinit
+      - seatd-dinit
+      - iwd-dinit
+      - pipewire-dinit
+      - pipewire-pulse-dinit
+      - wireplumber-dinit
+      - bluez-dinit
+    openrc:
+      - metalog-openrc
+      - networkmanager-openrc
+      - cups-openrc
+      - artix-live-openrc
+    runit:
+      - userspawn-runit
+      - metalog-runit
+      - networkmanager-runit
+      - cups-runit
+      - artix-live-runit
+    s6:
+      - metalog-s6
+      - networkmanager-s6
+      - cups-s6
+      - artix-live-s6
+livefs:
+  packages:

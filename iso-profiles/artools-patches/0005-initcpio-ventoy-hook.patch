@@ -1,0 +1,25 @@
+--- a/usr/share/artools/lib/iso/initcpio.sh
++++ b/usr/share/artools/lib/iso/initcpio.sh
+@@ -9,7 +9,21 @@
+ 
+     mkinitcpio_conf=mkinitcpio-default.conf
+     [[ "${profile}" == 'base' ]] && mkinitcpio_conf=mkinitcpio-pxe.conf
+-    k=$(<"$mnt"/usr/src/linux/version)
++	k=$(cat ${mnt}/usr/src/linux/version 2>/dev/null || ls ${mnt}/usr/lib/modules/ | head -n 1)
++
++    # ZLINUX-VENTOY (errores.md B01): parchea el hook 'artix' del initramfs
++    # para aceptar /dev/mapper/ventoy cuando udev no crea el by-label.
++    # No fatal: si el hunk no aplica (iso-initcpio nuevo), se avisa y sigue.
++    local ventoy_diff=/usr/share/artools/zlinux/artix-hook-ventoy.diff
++    if [[ -f ${ventoy_diff} && -f ${mnt}/etc/initcpio/hooks/artix ]]; then
++        if ! grep -q 'ZLINUX-VENTOY' "${mnt}"/etc/initcpio/hooks/artix 2>/dev/null; then
++            if patch --forward --strip=1 --directory="${mnt}" --input="${ventoy_diff}" &>/dev/null; then
++                msg2 "Hook 'artix' parcheado (fallback Ventoy)"
++            else
++                warning "No se pudo parchear el hook 'artix' (revisar errores.md B01)"
++            fi
++        fi
++    fi
+ 
+     if [[ -v key_export ]]; then
+         exec {ARTIX_GNUPG_FD}<"${key_export}"

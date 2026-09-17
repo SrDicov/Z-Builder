@@ -1,0 +1,7 @@
+type = process
+command = noctalia
+depends-on = labwc
+depends-on = dbus
+depends-on = pipewire
+restart = true
+smooth-termination = true

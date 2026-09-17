@@ -1,0 +1,5 @@
+QT_QPA_PLATFORMTHEME=gtk4
+#QT_STYLE_OVERRIDE=qt6gtk2
+QTWEBENGINE_CHROMIUM_FLAGS="-blink-settings=darkModeEnabled=true -enable-features=OverlayScrollbar,OverlayScrollbarFlashAfterAnyScrollUpdate,OverlayScrollbarFlashWhenMouseEnter"
+# Prevent installing Mono/Gecko, setting windows apps as default
+WINEDLLOVERRIDES=mscoree=d;mshtml=d;winemenubuilder.exe=d

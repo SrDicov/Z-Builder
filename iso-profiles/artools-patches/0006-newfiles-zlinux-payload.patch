@@ -1,0 +1,34 @@
+--- /dev/null
++++ b/usr/share/artools/zlinux/artix-hook-ventoy.diff
+@@ -0,0 +1,31 @@
++--- a/etc/initcpio/hooks/artix
+++++ b/etc/initcpio/hooks/artix
++@@ -82,6 +82,28 @@
++     local flg="${3}"
++     local opts="${4}"
++ 
+++    # ZLINUX-VENTOY (errores.md B01): Ventoy expone la ISO como
+++    # /dev/mapper/ventoy y udev a veces no crea el symlink
+++    # /dev/disk/by-label/<LABEL>. Si el by-label no existe pero hay un
+++    # device-mapper con el mismo LABEL, se usa el dispositivo directo.
+++    case "${dev}" in
+++        /dev/disk/by-label/*)
+++            if [[ ! -e "${dev}" ]]; then
+++                local _lbl="${dev#/dev/disk/by-label/}" _vm _got=""
+++                for _vm in /dev/mapper/ventoy /dev/mapper/Ventoy; do
+++                    if [[ -e "${_vm}" ]]; then
+++                        _got=$(blkid -o value -s LABEL "${_vm}" 2>/dev/null)
+++                        if [[ "${_got}" == "${_lbl}" ]]; then
+++                            msg ":: Z-Linux: Ventoy detectado (${_vm}), usando dispositivo directo"
+++                            dev="${_vm}"
+++                            break
+++                        fi
+++                    fi
+++                done
+++            fi
+++            ;;
+++    esac
+++
++     mkdir -p "${mnt}"
++ 
++     msg ":: Mounting '${dev}' to '${mnt}'"

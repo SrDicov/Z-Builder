@@ -1,0 +1,30 @@
+--- a/usr/share/artools/lib/iso/services.sh
++++ b/usr/share/artools/lib/iso/services.sh
+@@ -85,12 +85,13 @@
+     for svc in "${SERVICES[@]}"; do
+         if [[ -f "$mnt"/etc/dinit.d/"$svc" ]]; then
+             msg2 "Setting %s: [%s]" "${INITSYS}" "$svc"
+-            chroot "$mnt" ln -s /etc/dinit.d/"$svc" /etc/dinit.d/boot.d/ &>/dev/null
++            # ZLINUX: -f para re-ejecuciones con -c (no abortar si ya existe).
++            chroot "$mnt" ln -sfn /etc/dinit.d/"$svc" /etc/dinit.d/boot.d/ &>/dev/null
+         else
+             warning "Service %s not found. Skipping." "$svc"
+         fi
+     done
+-    chroot "$mnt" ln -s /usr/lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/ &>/dev/null
++    chroot "$mnt" ln -sfn /usr/lib/dinit.d/dinit-user-spawn /etc/dinit.d/boot.d/ &>/dev/null
+ }
+ 
+ add_user_svc_dinit(){
+@@ -100,7 +101,10 @@
+             msg2 "Setting user %s: [%s]" "${INITSYS}" "$svc"
+             local usr_sv="/home/${LIVEUSER}/.config/dinit.d"
+             chroot "$mnt" mkdir -p "$usr_sv"/boot.d
+-            chroot "$mnt" ln -s /etc/dinit.d/user/"$svc" "$usr_sv"/boot.d/"$svc"
++            # ZLINUX (errores.md A22): -f porque skel ya trae copias fijas
++            # de estos servicios (para el instalado/nuevos usuarios); aqui
++            # mandan los links vivos del chroot.
++            chroot "$mnt" ln -sfn /etc/dinit.d/user/"$svc" "$usr_sv"/boot.d/"$svc"
+             chroot "$mnt" chown -R "${LIVEUSER}:${LIVEUSER}" "$usr_sv"
+         else
+             warning "Service %s not found. Skipping." "$svc"

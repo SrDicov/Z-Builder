@@ -1,0 +1,5 @@
+border.width: 1
+window.active.border.color: #3b4252
+window.inactive.border.color: #1a1d24
+window.active.title.bg.color: #1a1d24
+window.inactive.title.bg.color: #14161b

@@ -1,0 +1,19 @@
+# Z Linux autostart
+#
+# NOTA (errores.md A21): hay DOS vias de arranque del escritorio y AMBAS se
+# conservan a proposito:
+#   1. Esta via (tty1 -> .bash_profile -> exec labwc -> este autostart):
+#      es la ACTIVA en el live y en el instalado.
+#   2. Servicios de usuario dinit (.config/dinit.d/{labwc,noctalia}):
+#      alternativa para gestores de sesion / inicios personalizados.
+# Si algun dia solo queda una, que sea la 1 (es la probada).
+gnome-keyring-daemon --start --components=secrets,ssh &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+thunar --daemon &
+dbus-update-activation-environment WAYLAND_DISPLAY 2>/dev/null || true
+# Quirk QEMU/virtio (errores.md A20): apaga la salida VGA fantasma DP-3
+# que extiende el escritorio y "roba" el raton. Solo en VMs QEMU.
+if grep -qi qemu /sys/class/dmi/id/sys_vendor 2>/dev/null; then
+    wlr-randr --output DP-3 --off 2>/dev/null || true
+fi
+noctalia &

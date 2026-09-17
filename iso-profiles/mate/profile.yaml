@@ -1,0 +1,98 @@
+---
+
+live-session:
+  user: artix
+  password: artix
+  autologin: true
+  use-xlibre: false
+  services:
+    - acpid
+    - bluetoothd
+    - cronie
+    - chrony
+    - cupsd
+    - metalog
+    - connmand
+    - lightdm
+  user-services:
+    - dbus
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+rootfs:
+  packages:
+    - lightdm-gtk-greeter
+    - connman-gtk
+    - caja-image-converter
+    - caja-open-terminal
+    - caja-sendto
+    - caja-wallpaper
+    - caja-xattr-tags
+    - engrampa
+    - eom
+    - mate
+    - mate-applets
+    - mate-icon-theme-faenza
+    - mate-media
+    - mate-netbook
+    - mate-power-manager
+    - mate-screensaver
+    - mate-sensors-applet
+    - mate-system-monitor
+    - mate-terminal
+    - mate-utils
+    - mozo
+    - atril
+    - epiphany
+    - leafpad
+    - pavucontrol
+    - pipewire-pulse
+  packages-init:
+    dinit:
+      - cups-dinit
+      - metalog-dinit
+      - pipewire-dinit
+      - pipewire-pulse-dinit
+      - wireplumber-dinit
+      - userspawn-dinit
+      - connman-dinit
+      - lightdm-dinit
+    openrc:
+      - cups-openrc
+      - metalog-openrc
+      - pipewire-openrc
+      - pipewire-pulse-openrc
+      - wireplumber-openrc
+      - connman-openrc
+      - lightdm-openrc
+    runit:
+      - cups-runit
+      - metalog-runit
+      - userspawn-runit
+      - connman-runit
+      - lightdm-runit
+    s6:
+      - cups-s6
+      - metalog-s6
+      - connman-s6
+      - lightdm-s6
+livefs:
+  packages:
+    - artix-docs
+    - artix-grub-live
+    - broadcom-wl
+    - calamares-extensions
+    - mkinitcpio-nfs-utils
+    - squashfs-tools
+    - virtualbox-guest-utils
+    - hexchat
+    - gparted
+  packages-init:
+    dinit:
+      - artix-live-dinit
+    openrc:
+      - artix-live-openrc
+    runit:
+      - artix-live-runit
+    s6:
+      - artix-live-s6

@@ -1,0 +1,91 @@
+---
+
+live-session:
+  user: artix
+  password: artix
+  autologin: true
+  use-xlibre: false
+  services:
+    - acpid
+    - bluetoothd
+    - cronie
+    - chrony
+    - cupsd
+    - metalog
+    - NetworkManager
+    - lightdm
+  user-services:
+    - dbus
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+rootfs:
+  packages:
+    - lightdm-gtk-greeter
+    - cinnamon
+    - eog
+    - file-roller
+    - gnome-calculator
+    - gnome-disk-utility
+    - gnome-keyring
+    - gnome-online-accounts
+    - gnome-screenshot
+    - gnome-system-monitor
+    - gnome-terminal
+    - nemo-fileroller
+    - nemo-share
+    - xcursor-vanilla-dmz
+    - atril
+    - epiphany
+    - leafpad
+    - pavucontrol
+    - pipewire-pulse
+  packages-init:
+    dinit:
+      - cups-dinit
+      - metalog-dinit
+      - pipewire-dinit
+      - pipewire-pulse-dinit
+      - wireplumber-dinit
+      - userspawn-dinit
+      - networkmanager-dinit
+      - lightdm-dinit
+    openrc:
+      - cups-openrc
+      - metalog-openrc
+      - pipewire-openrc
+      - pipewire-pulse-openrc
+      - wireplumber-openrc
+      - networkmanager-openrc
+      - lightdm-openrc
+    runit:
+      - cups-runit
+      - metalog-runit
+      - userspawn-runit
+      - networkmanager-runit
+      - lightdm-runit
+    s6:
+      - cups-s6
+      - metalog-s6
+      - networkmanager-s6
+      - lightdm-s6
+livefs:
+  packages:
+    - artix-docs
+    - artix-grub-live
+    - broadcom-wl
+    - calamares-extensions
+    - mkinitcpio-nfs-utils
+    - squashfs-tools
+    - virtualbox-guest-utils
+    - hexchat
+    - gparted
+  packages-init:
+    dinit:
+      - artix-live-dinit
+    openrc:
+      - artix-live-openrc
+    runit:
+      - artix-live-runit
+    s6:
+      - artix-live-s6

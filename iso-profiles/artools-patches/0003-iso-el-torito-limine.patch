@@ -1,0 +1,17 @@
+--- a/usr/share/artools/lib/iso/iso.sh
++++ b/usr/share/artools/lib/iso/iso.sh
+@@ -35,11 +35,11 @@
+         -r -graft-points -no-pad \
+         --sort-weight 0 / \
+         --sort-weight 1 /boot \
+-        --grub2-mbr "${iso_root}"/boot/grub/i386-pc/boot_hybrid.img \
++        --grub2-mbr "${iso_root}"/boot/boot_hybrid.img \
+         -partition_offset 16 \
+-        -b boot/grub/i386-pc/eltorito.img \
++        -b boot/limine-bios-cd.bin \
+         -c boot.catalog \
+-        -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
++        -no-emul-boot -boot-load-size 4 -boot-info-table \
+         -eltorito-alt-boot \
+         -append_partition 2 0xef "${iso_root}"/boot/efi.img \
+         -e --interval:appended_partition_2:all:: -iso_mbr_part_type 0x00 \

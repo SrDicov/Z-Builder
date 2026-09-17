@@ -1,0 +1,7 @@
+/etc/xdg/autostart/xapp-sn-watcher.desktop
+/etc/xdg/autostart/at-spi-dbus-bus.desktop
+/etc/xdg/autostart/polkit-kde-authentication-agent-1.desktop
+/etc/xdg/autostart/pulseaudio.desktop
+/etc/xdg/autostart/xdg-user-dirs.desktop
+connman-gtk.desktop
+volumeicon.desktop

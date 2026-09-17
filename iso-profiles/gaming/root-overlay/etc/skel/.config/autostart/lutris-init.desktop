@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=sh -c "~/.config/autostart/lutris-init.sh"
+Name=Populate Lutris library
+StartupNotify=false
+Terminal=false
+Type=Application

@@ -1,0 +1,68 @@
+--- a/usr/share/artools/lib/iso/config.sh
++++ b/usr/share/artools/lib/iso/config.sh
+@@ -5,11 +5,25 @@
+ #{{{ session
+ 
+ configure_user(){
+-    local -r grps="users,lp,video,network,storage,wheel,audio,power,log,optical,network,scanner"
+-
+-    chroot "$1" useradd -m -G "$grps" -s /bin/bash "${LIVEUSER}"
++    # ZLINUX (errores.md A08): 'seat' para que libseat abra el socket sin
++    # root. 'input' NO va aqui: si el grupo no existe, useradd falla entero.
++    local -r grps="users,lp,video,network,storage,wheel,audio,power,log,optical,network,scanner,seat"
++
++    # ZLINUX: idempotente (re-ejecuciones con -c no deben abortar).
++    if ! chroot "$1" id "${LIVEUSER}" &>/dev/null; then
++        chroot "$1" useradd -m -G "$grps" -s /bin/bash "${LIVEUSER}"
++    fi
+     echo "${LIVEUSER}:${PASSWORD}" | chroot "$1" chpasswd
+     echo "root:${PASSWORD}" | chroot "$1" chpasswd
++    # ZLINUX (errores.md A03): el overlay trae /home/$LIVEUSER como
++    # root:root porque 'useradd -m' no toca un home ya existente.
++    chroot "$1" chown -R "${LIVEUSER}:${LIVEUSER}" /home/"${LIVEUSER}"
++    # ZLINUX (errores.md A05/boot-race 20260917): pre-compilar locales en
++    # el build para que no haya escrituras en / durante el arranque
++    # (cualquier escritura concurrente rompe root-ro con EBUSY=32).
++    if [[ -f "$1"/etc/locale.gen ]]; then
++        chroot "$1" locale-gen &>/dev/null || warning "locale-gen fallo en [%s]" "${1##*/}"
++    fi
+ }
+ 
+ configure_services(){
+@@ -21,6 +35,28 @@
+     fi
+ }
+ 
++# ZLINUX: deja el live 100% cocinado en el build para que ningun
++# servicio de arranque tenga que escribir en / (ver boot failure
++# 20260917 en errores.md: escrituras concurrentes en / rompen
++# root-ro con EBUSY=32 y tumban todo el arranque).
++configure_zlinux(){
++    local mnt="$1"
++    # sudoers.d debe ser 0440 (git no guarda ese modo).
++    if [[ -d "$mnt"/etc/sudoers.d ]]; then
++        chmod 0440 "$mnt"/etc/sudoers.d/* 2>/dev/null || true
++    fi
++    # Llaveros listos desde el primer arranque (sin populate en vivo).
++    if chroot "$mnt" pacman-key --list-keys cachyos-master &>/dev/null; then
++        msg2 "Keyring cachyos ya poblado"
++    else
++        msg "Poblando keyrings en [%s] ..." "${mnt##*/}"
++        chroot "$mnt" pacman-key --init &>/dev/null || true
++        chroot "$mnt" pacman-key --populate artix cachyos &>/dev/null \
++            || warning "keyrings no poblados (ver errores.md A04)"
++    fi
++}
++
++
+ write_live_session_conf(){
+     local conf=''
+     conf+=$(printf '%s\n' '# live session configuration')
+@@ -33,6 +69,7 @@
+     local fs="$1"
+     msg "Configuring [%s]" "${fs##*/}"
+     configure_user "$fs"
++    configure_zlinux "$fs"
+     configure_services "$fs"
+     configure_calamares "$fs"
+     [[ ! -d "$fs/etc/artools" ]] && mkdir -p "$fs/etc/artools"
