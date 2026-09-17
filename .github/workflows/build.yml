@@ -66,6 +66,11 @@ jobs:
           bash -n /usr/share/artools/lib/iso/*.sh /usr/bin/buildiso
           ls -lh /usr/share/artools/lib/iso/config.sh
           cat ~/.config/artools/pacman.conf.d/iso-x86_64.conf | head -n 30
+          echo "=== DEBUG dinit availability ==="
+          pacman -Ss dinit | head -n 30 || true
+          pacman -Si dinit 2>&1 | head -n 30 || true
+          pacman -Sl system 2>&1 | grep -i dinit | head -n 20 || true
+          pacman -Sl world 2>&1 | grep -i dinit | head -n 20 || true
 
       - name: Build ISO (chroot + squash + limine)
         run: |
