@@ -15,7 +15,7 @@ jobs:
   iso:
     runs-on: ubuntu-latest
     container:
-      image: artixlinux/artix:latest
+      image: artixlinux/artixlinux:base-dinit
       options: --privileged
     steps:
       - name: Checkout Z-Builder
@@ -32,14 +32,15 @@ jobs:
       - name: Setup builder (pacman CachyOS + artools + limine)
         run: |
           set -x
-          pacman -Sy --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine
-          # CachyOS pacman (soporta x86_64_v3) — reemplaza pacman stock
-          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring*.pkg.tar.zst || true
-          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist*.pkg.tar.zst || true
-          # artools-iso 0.39.1-1 (Artix)
-          pacman -Sy --noconfirm artools-iso || pacman -U --noconfirm https://artixlinux.org/packages/artools-iso*.pkg.tar.zst
-          # Parches Z-Linux (viven en iso-profiles/artools-patches)
-          ./iso-profiles/artools-patches/aplicar-parches.sh || bash ./iso-profiles/artools-patches/aplicar-parches.sh
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine
+          # CachyOS repos para x86_64_v3 (pacman ya soporta v3 en Artix con cachyos keyring)
+          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring/cachyos-keyring-*.pkg.tar.zst || true
+          pacman -U --noconfirm https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist/cachyos-mirrorlist-*.pkg.tar.zst || true
+          # artools-iso (si no está en repos Artix, lo trae via pacman -Sy)
+          pacman -Sy --noconfirm artools-iso || (git clone https://gitea.artixlinux.org/artix/artools.git /tmp/artools && make -C /tmp/artools && make -C /tmp/artools install)
+          # Parches Z-Linux
+          bash ./iso-profiles/artools-patches/aplicar-parches.sh
           bash -n /usr/share/artools/lib/iso/*.sh /usr/bin/buildiso
           ls -lh /usr/share/artools/lib/iso/config.sh
 
