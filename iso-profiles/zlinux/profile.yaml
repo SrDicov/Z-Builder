@@ -24,6 +24,9 @@ live-session:
     - wireplumber
 rootfs:
   packages:
+    - dinit
+    - dinit-rc
+    - elogind
     - mkinitcpio-nfs-utils
     - squashfs-tools
     - cachyos/pacman
