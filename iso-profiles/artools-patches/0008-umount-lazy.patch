@@ -1,0 +1,13 @@
+--- a/usr/share/artools/lib/iso/mount.sh
++++ b/usr/share/artools/lib/iso/mount.sh
+@@ -49,6 +49,9 @@ umount_overlayfs(){
+     if [[ -n "${FS_ACTIVE_MOUNTS[*]}" ]];then
+         msg2 "overlayfs umount: [%s]" "${FS_ACTIVE_MOUNTS[@]}"
+-        umount "${FS_ACTIVE_MOUNTS[@]}"
++        # ZLINUX: fallback lazy (un daemon colgado en el chroot deja el
++        # mount busy y tumba make_livefs con exit 32; el squash posterior
++        # lee el upperdir ya desacoplado, asi que es seguro).
++        umount "${FS_ACTIVE_MOUNTS[@]}" 2>/dev/null || umount -l "${FS_ACTIVE_MOUNTS[@]}"
+         unset FS_ACTIVE_MOUNTS
+         rm -rf "${mnt_dir}/work"
+     fi
