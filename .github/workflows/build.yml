@@ -90,9 +90,21 @@ jobs:
           mount --make-rprivate "${GITHUB_WORKSPACE}/buildiso-work" 2>/dev/null || true
           mkdir -p ~/artools-workspace
           cp -a iso-profiles ~/artools-workspace/
-          # -x = solo chroot, verifica antes del squash
+          # -x = solo chroot, verifica antes del squash.
+          # OJO: buildiso -x sale con exit 1 A PROPOSITO tras el exito
+          # ("Continue squash: buildiso -p zlinux -sc ..."). Exito real =
+          # locks rootfs.lock+livefs.lock presentes.
+          set +e
           buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" -x 2>&1 | tee /tmp/build-x.log | tail -n 100
-          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/dinit/livefs | tee /tmp/verificar.log
+          XCODE=${PIPESTATUS[0]}
+          set -e
+          echo "-x exit code: $XCODE"
+          if [ ! -f /var/lib/artools/buildiso/zlinux/artix/livefs.lock ]; then
+            echo "ERROR: -x fallo sin livefs.lock (code $XCODE), ver /tmp/build-x.log"
+            exit 1
+          fi
+          echo "-x OK (locks presentes, exit $XCODE es el 'Continue squash' esperado)"
+          ~/artools-workspace/iso-profiles/artools-patches/verificar-chroot.sh /var/lib/artools/buildiso/zlinux/artix/livefs | tee /tmp/verificar.log
           # Build completo (squash + iso limine)
           buildiso -p "${{ inputs.profile || 'zlinux' }}" -i "${{ inputs.initsys || 'dinit' }}" 2>&1 | tee /tmp/build.log | tail -n 100
           ls -lh ~/artools-workspace/iso/zlinux/
