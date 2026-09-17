@@ -68,7 +68,7 @@ jobs:
           echo "=== artools pacman.conf (sin IgnorePkg para basestrap) ==="
           grep -E '^\[|IgnorePkg' ~/.config/artools/pacman.conf.d/iso-x86_64.conf | head -n 30 || true
           echo "=== verifica pines Artix resuelven en config artools ==="
-          for p in system/dbus system/util-linux system/util-linux-libs system/pam system/procps-ng system/gnupg system/gpgme system/libassuan world/libmm-glib world/libwireplumber world/modemmanager world/pcsclite world/wireplumber world/udisks2 world/fluidsynth world/sdbus-cpp world/seatd world/polkit world/libpulse world/gnome-keyring world/rtkit dinit dinit-rc elogind; do
+          for p in system/dbus system/util-linux system/util-linux-libs system/pam system/procps-ng system/gnupg system/gpgme system/libassuan system/lvm2 system/ppp system/rpcbind system/gssproxy world/libmm-glib world/libwireplumber world/modemmanager world/pcsclite world/wireplumber world/udisks2 world/fluidsynth world/sdbus-cpp world/seatd world/polkit world/libpulse world/gnome-keyring world/rtkit dinit dinit-rc elogind; do
             pacman --config ~/.config/artools/pacman.conf.d/iso-x86_64.conf -Si "$p" 2>&1 | grep -E '^(Nombre|Name|Repositorio|Repository|Versi|Version)' | head -n 2 || echo "PIN FALLO: $p"
           done
 

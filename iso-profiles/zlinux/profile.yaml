@@ -44,6 +44,10 @@ rootfs:
     - system/gnupg
     - system/gpgme
     - system/libassuan
+    - system/lvm2
+    - system/ppp
+    - system/rpcbind
+    - system/gssproxy
     - world/modemmanager
     - world/libmm-glib
     - world/libwireplumber
