@@ -33,7 +33,7 @@ jobs:
         run: |
           set -x
           pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine arch-install-scripts
+          pacman -S --noconfirm --needed base-devel git squashfs-tools xorriso dosfstools mtools edk2-ovmf qemu-base limine
           # Configura repos CachyOS para el host y para artools (soporta x86_64_v3)
           mkdir -p /etc/pacman.d
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/ || true
