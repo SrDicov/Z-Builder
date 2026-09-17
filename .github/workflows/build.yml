@@ -85,6 +85,9 @@ jobs:
           ln -s "${GITHUB_WORKSPACE}/buildiso-work" /var/lib/artools/buildiso
           df -h "${GITHUB_WORKSPACE}" /var/lib/artools/buildiso | head
           stat -f -c 'fstype=%T' "${GITHUB_WORKSPACE}/buildiso-work" /tmp
+          # Evita que los mounts del chroot se propaguen y dejen busy el umount
+          mount --make-rprivate / 2>/dev/null || true
+          mount --make-rprivate "${GITHUB_WORKSPACE}/buildiso-work" 2>/dev/null || true
           mkdir -p ~/artools-workspace
           cp -a iso-profiles ~/artools-workspace/
           # -x = solo chroot, verifica antes del squash

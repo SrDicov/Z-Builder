@@ -52,6 +52,10 @@
 +        chroot "$mnt" pacman-key --populate artix cachyos &>/dev/null \
 +            || warning "keyrings no poblados (ver errores.md A04)"
 +    fi
++    # ZLINUX (CI overlay busy): pacman-key deja gpg-agent colgado dentro
++    # del chroot y el umount del overlay livefs falla con 'target is busy'.
++    chroot "$mnt" gpgconf --kill gpg-agent &>/dev/null || true
++    chroot "$mnt" pkill -9 gpg-agent &>/dev/null || true
 +}
 +
 +
