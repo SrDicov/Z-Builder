@@ -41,15 +41,17 @@ jobs:
           mkdir -p ~/.config/artools/pacman.conf.d
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
-          # Instala keyring CachyOS (primero con SigLevel Never para evitar unknown trust)
+          # Instala pacman CachyOS (soporta x86_64_v3, stock rechaza v3)
           cp /etc/pacman.conf /tmp/pacman.conf.bak
           cp ~/.config/artools/pacman.conf.d/iso-x86_64.conf /tmp/artools-pacman.conf.bak
           sed -i 's/^SigLevel.*/SigLevel = Never/' /etc/pacman.conf
           sed -i 's/^SigLevel.*/SigLevel = Never/' ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           pacman -Sy --noconfirm
           pacman -S --noconfirm --needed cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist || true
-          mv /tmp/pacman.conf.bak /etc/pacman.conf
-          mv /tmp/artools-pacman.conf.bak ~/.config/artools/pacman.conf.d/iso-x86_64.conf
+          # Reemplaza pacman stock por el de CachyOS (soporta x86_64_v3); restaura conf Z-Linux que sobreescribe
+          pacman -S --noconfirm cachyos/pacman || true
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
           pacman-key --init || true
           pacman-key --populate cachyos || true
           pacman-key --populate artix archlinux || true
