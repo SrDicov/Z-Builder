@@ -29,7 +29,7 @@
  }
  
  configure_services(){
-@@ -21,6 +35,32 @@
+@@ -21,6 +35,34 @@
       fi
   }
  
@@ -52,17 +52,19 @@
 +        chroot "$mnt" pacman-key --populate artix cachyos &>/dev/null \
 +            || warning "keyrings no poblados (ver errores.md A04)"
 +    fi
-+    # ZLINUX (CI overlay busy): pacman-key deja gpg-agent colgado dentro
-+    # del chroot y el umount del overlay livefs falla con 'target is busy'.
-+    chroot "$mnt" gpgconf --kill gpg-agent &>/dev/null || true
-+    chroot "$mnt" pkill -9 gpg-agent &>/dev/null || true
++    # ZLINUX (CI overlay busy): pacman-key deja daemons (gpg-agent,
++    # dirmngr) chrooteados en $mnt y el umount del overlay livefs falla
++    # con 'target is busy' (PID con cwd+root dentro, ver CI 20260917).
++    # --kill all los tumba a todos (gpg-agent solo no basta: dirmngr
++    # sobrevive y retiene el mount).
++    chroot "$mnt" gpgconf --kill all &>/dev/null || true
 +}
 +
 +
  write_live_session_conf(){
      local conf=''
      conf+=$(printf '%s\n' '# live session configuration')
-@@ -33,6 +73,7 @@
+@@ -33,6 +75,7 @@
       local fs="$1"
      msg "Configuring [%s]" "${fs##*/}"
      configure_user "$fs"

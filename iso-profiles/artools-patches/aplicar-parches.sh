@@ -38,6 +38,7 @@ apply 0004-configure-user-zlinux.patch /usr/share/artools/lib/iso/config.sh   'c
 apply 0005-initcpio-ventoy-hook.patch  /usr/share/artools/lib/iso/initcpio.sh 'ZLINUX-VENTOY'
 apply 0006-newfiles-zlinux-payload.patch /usr/share/artools/zlinux/artix-hook-ventoy.diff 'ZLINUX-VENTOY'
 apply 0007-user-svc-ln-force.patch /usr/share/artools/lib/iso/services.sh 'ln -sfn /etc/dinit.d/"$svc" /etc/dinit.d/boot.d/'
+apply 0008-umount-lazy.patch /usr/share/artools/lib/iso/mount.sh 'umount -l'
 
 echo "== sintaxis"
 for f in /usr/bin/buildiso /usr/share/artools/lib/iso/*.sh; do bash -n "$f" || { echo "SYNTAX FAIL: $f"; fails=$((fails+1)); }; done

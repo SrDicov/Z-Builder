@@ -19,6 +19,7 @@ Serie (orden de aplicación, formato `patch -p1 -d /`):
 | `0005-initcpio-ventoy-hook.patch` | `lib/iso/initcpio.sh` | fallback versión kernel + inyección del fix Ventoy (B01) |
 | `0006-newfiles-zlinux-payload.patch` | `share/artools/zlinux/*` | payload: diff del hook `artix` del initramfs (fallback `/dev/mapper/ventoy`) |
 | `0007-user-svc-ln-force.patch` | `lib/iso/services.sh` | `ln -sfn` en user-services dinit (skel trae copias fijas, A22) |
+| `0008-umount-lazy.patch` | `lib/iso/mount.sh` | fallback `umount -l` en `umount_overlayfs` (daemons en chroot dejan busy el livefs en CI, exit 32) |
 
-Generados contra `artools-iso 0.39.1-1`. Si un hunk falla con otra versión,
+Generados contra `artools-iso 0.39.1-1` (0008 contra `0.40.0`). Si un hunk falla con otra versión,
 portar el bloque `ZLINUX*` a mano y regenerar con `diff -u`.
