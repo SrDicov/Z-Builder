@@ -29,9 +29,9 @@
  }
  
  configure_services(){
-@@ -21,6 +35,28 @@
-     fi
- }
+@@ -21,6 +35,32 @@
+      fi
+  }
  
 +# ZLINUX: deja el live 100% cocinado en el build para que ningun
 +# servicio de arranque tenga que escribir en / (ver boot failure
@@ -62,8 +62,8 @@
  write_live_session_conf(){
      local conf=''
      conf+=$(printf '%s\n' '# live session configuration')
-@@ -33,6 +69,7 @@
-     local fs="$1"
+@@ -33,6 +73,7 @@
+      local fs="$1"
      msg "Configuring [%s]" "${fs##*/}"
      configure_user "$fs"
 +    configure_zlinux "$fs"
