@@ -99,6 +99,31 @@ jobs:
           sha256sum ~/artools-workspace/iso/zlinux/*.iso > SHA256SUMS
           cat SHA256SUMS
 
+      - name: Diagnose busy mount (on failure)
+        if: failure()
+        run: |
+          set -x
+          M="/__w/Z-Builder/Z-Builder/buildiso-work/zlinux/artix/livefs"
+          echo "livefs=$M"
+          echo "=== mountinfo ==="
+          cat /proc/self/mountinfo | grep -E "livefs|buildiso-work" || echo "(sin entradas livefs)"
+          echo "=== holders por cwd/root ==="
+          for d in /proc/[0-9]*/cwd /proc/[0-9]*/root; do
+            t=$(readlink "$d" 2>/dev/null) || continue
+            case "$t" in *livefs*|*buildiso-work*) echo "$d -> $t";; esac
+          done
+          echo "(fin holders)"
+          echo "=== fds abiertos bajo livefs ==="
+          for fd in /proc/[0-9]*/fd/*; do
+            t=$(readlink "$fd" 2>/dev/null) || continue
+            case "$t" in *livefs*) echo "$fd -> $t";; esac
+          done | head -30
+          echo "(fin fds)"
+          echo "=== submounts ==="
+          findmnt -R "$M" 2>/dev/null || echo "(findmnt sin nada)"
+          echo "=== procesos con gpg/agent ==="
+          ps aux | grep -iE "gpg|dirmngr" | grep -v grep | head || echo "(ninguno)"
+
       - name: Upload build logs (siempre)
         if: always()
         uses: actions/upload-artifact@v4
