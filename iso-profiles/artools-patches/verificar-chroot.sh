@@ -7,6 +7,9 @@ fail=0
 t(){ if eval "$2" >/dev/null 2>&1; then echo "OK    $1"; else echo "FALLO $1"; fail=$((fail+1)); fi; }
 
 echo "== chroot: $M"
+echo "-- ficheros que linkan libsystemd.so.0 (vacio = bien):"
+grep -rl 'libsystemd\.so\.0' $M/usr/lib $M/usr/bin $M/bin $M/sbin 2>/dev/null | head -20
+echo "-- fin lista libsystemd"
 t "A01/A02 sin libsystemd linkado" \
   "! grep -rl 'libsystemd\.so\.0' $M/usr/lib $M/usr/bin $M/bin $M/sbin 2>/dev/null | grep -q ."
 t "A01/A02 IgnorePkg de 21 en pacman.conf" \
