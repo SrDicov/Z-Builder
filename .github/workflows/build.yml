@@ -40,6 +40,7 @@ jobs:
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.d/cachyos-v3-mirrorlist /etc/pacman.d/ || true
           mkdir -p ~/.config/artools/pacman.conf.d
           cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf ~/.config/artools/pacman.conf.d/iso-x86_64.conf
+          cp -v iso-profiles/zlinux/root-overlay/etc/pacman.conf /etc/pacman.conf
           # Sincroniza DBs con los nuevos repos (ahora sí existen cachyos-v3/cachyos)
           pacman -Sy --noconfirm
           # Instala keyring CachyOS (evita el wildcard roto: usa pacman -Sy cachyos-keyring)
